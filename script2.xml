@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<meta-runner name="Install TCC Tools on target (5) (3)"> 
+<description>Remove all TCC files on machine. Copy binary_package to target and install it</description> 
+<settings> 
+<parameters> 
+
+
+<param name="tcc_tools_root" value="" /> 
+</parameters> 
+<build-runners> 
+<runner name="Cleanup" type="ssh-exec-runner"> 
+<parameters> 
+<param name="jetbrains.buildServer.deployer.targetUrl" value="%target_hostname%" /> 
+<param name="jetbrains.buildServer.deployer.username" value="root" /> 
+<param name="jetbrains.buildServer.sshexec.authMethod" value="PWD" /> 
+<param name="jetbrains.buildServer.sshexec.command"><![CDATA[#Remove unnecessary and old files 
+set -x 
+
+
+rm -rf %target_download_dir% 
+
+
+#clean stress-ng 
+Test <param name="teamcity.step.mode" value="default" /> 
+</parameters> 
+</runner> 
+<runner name="Copy TCC Tools" type="ssh-deploy-runner"> 
+<parameters> 
+<param name="jetbrains.buildServer.deployer.sourcePath"><![CDATA[%tcc_tools_root%/target => target 
+%tccdev_checkout_dir%/ci/check_tcc_uninstall.sh]]></param> 
+<param name="jetbrains.buildServer.deployer.ssh.transport" value="jetbrains.buildServer.deployer.ssh.transport.scp" /> 
+<param name="jetbrains.buildServer.deployer.targetUrl" value="%target_hostname%:%target_download_dir%" /> 
+<param name="jetbrains.buildServer.deployer.username" value="root" /> 
+<param name="jetbrains.buildServer.sshexec.authMethod" value="PWD" /> 
+<param name="secure:jetbrains.buildServer.deployer.password" value="Test" /> 
+<param name="teamcity.step.mode" value="default" /> 
+</parameters> 
+</runner> 
+<runner name="Install TCC Tools" type="ssh-exec-runner"> 
+<parameters> 
+<param name="jetbrains.buildServer.deployer.targetUrl" value="%target_hostname%" /> 
+<param name="jetbrains.buildServer.deployer.username" value="root" /> 
+<param name="jetbrains.buildServer.sshexec.authMethod" value="PWD" /> 
+<param name="jetbrains.buildServer.sshexec.command"><![CDATA[set -x 
+set -e 
+set -x 
+
+
+cd %target_download_dir% 
+
+
+# Remove all TCC Tools files (ignore possible non-zero code) 
+./check_tcc_uninstall.sh -d || true 
+
+
+cd target 
+./tcc_setup.py -i %product_name%_target_*.tar.gz]]></param> 
+<param name="secure:jetbrains.buildServer.deployer.password" value="Test" /> 
+<param name="teamcity.step.mode" value="default" /> 
+</parameters> 
+</runner> 
+</build-runners> 
+<requirements /> 
+</settings> 
+</meta-runner> 
+
