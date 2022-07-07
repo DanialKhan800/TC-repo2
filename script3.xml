@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<meta-runner name="Prepare cache-lock (5) (3)"> 
+<description>Enable SlimVMM, tcc_buffer driver and create regions</description> 
+<settings> 
+<parameters> 
+<param name="tests_download_dir" value="" /> 
+</parameters> 
+<build-runners> 
+<runner name="Configure cache" type="ssh-exec-runner"> 
+<parameters> 
+<param name="jetbrains.buildServer.deployer.targetUrl" value="%target_hostname%" /> 
+<param name="jetbrains.buildServer.deployer.username" value="root" /> 
+<param name="jetbrains.buildServer.sshexec.authMethod" value="PWD" /> 
+<param name="jetbrains.buildServer.sshexec.command"><![CDATA[set -x 
+
+
+
+
+if [ %BIOS_TYPE% == "UEFI" ]; then 
+script="/usr/share/tcc_tools/scripts/setup_ssram/tcc_setup_ssram.sh" 
+else 
+script="%target_download_dir%/install/tests/util/setup_ssram_sbl/tcc_setup_ssram_sbl.sh" 
+fi 
+
+
+if [ %WORKFLOW% = "DAILY" ]; then 
+# Force enable cache lock in daily, because cache agents bit masks aren't checked know, because 
+# hypervisor changes L2 and L3 
+bash "$script" enable 
+fi 
+
+
+bash "$script" enable --verify 
+if [ $? -ne 0 ]; then 
+bash "$script" enable 
+fi]]></param> 
+<param name="secure:jetbrains.buildServer.deployer.password" value="Test" /> 
+<param name="teamcity.step.mode" value="default" /> 
+</parameters> 
+</runner> 
+<runner name="Wait for reconnect" type="simpleRunner"> 
+<parameters> 
+<param name="org.jfrog.artifactory.selectedDeployableServer.downloadSpecSource" value="Job configuration" /> 
+<param name="org.jfrog.artifactory.selectedDeployableServer.uploadSpecSource" value="Job configuration" /> 
+<param name="org.jfrog.artifactory.selectedDeployableServer.useSpecs" value="false" /> 
+<param name="script.content"><![CDATA[set -x 
+
+
+TIMEOUT_SEC=10 
+ATTEMPTS=15 
+
+
+ssh-keygen -R %target_hostname% 
+for i in `seq 1 $ATTEMPTS`; do 
+# -o ConnectTimeout=$TIMEOUT_SEC doesn't work for Team City 
+sshpass -p %TargetPass% ssh -o StrictHostKeyChecking=no -q root@%target_hostname% exit 
+if [ $? -eq 0 ]; then 
+exit 0 
+fi 
+sleep $TIMEOUT_SEC 
+done 
+exit -1]]></param> 
+<param name="teamcity.step.mode" value="default" /> 
+<param name="use.custom.script" value="true" /> 
+</parameters> 
+</runner> 
+<runner name="Verify cache configuration" type="ssh-exec-runner"> 
+<parameters> 
+<param name="jetbrains.buildServer.deployer.targetUrl" value="%target_hostname%" /> 
+<param name="jetbrains.buildServer.deployer.username" value="root" /> 
+<param name="jetbrains.buildServer.sshexec.authMethod" value="PWD" /> 
+<param name="jetbrains.buildServer.sshexec.command"><![CDATA[set -e 
+set -x 
+set -e 
+
+
+if [ %BIOS_TYPE% == "UEFI" ]; then 
+script="/usr/share/tcc_tools/scripts/setup_ssram/tcc_setup_ssram.sh" 
+else 
+script="%target_download_dir%/install/tests/util/setup_ssram_sbl/tcc_setup_ssram_sbl.sh" 
+fi 
+
+
+bash "$script" enable --verify]]></param> 
+<param name="secure:jetbrains.buildServer.deployer.password" value="Test" /> 
+<param name="teamcity.step.mode" value="default" /> 
+</parameters> 
+</runner> 
+</build-runners> 
+<requirements /> 
+</settings> 
+</meta-runner> 
+
