@@ -11,3 +11,8 @@ mkdir %host_test_path%
 cp %tccdev_checkout_dir%/ci/run_robot_tests.py %host_test_path% 
 cp %arch_tests_dir%/tcc_tools_tests.tar.gz %host_test_path% 
 
+
+# Extract test archive 
+cd %host_test_path% 
+tar -xzf tcc_tools_tests.tar.gz 
+
