@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<meta-runner name="Change output_dir parameter"> 
+<description>Custom step to change output_dir parameter to mask "build_brunch"_"build_number"</description> 
+<settings> 
+<parameters> 
+<param name="output_dir_to_change" value="%output_dir%" /> 
+<param name="output_dir_win_to_change" value="%output_dir_win%" /> 
+</parameters> 
+<build-runners> 
+<runner name="Change output_dir parameter" type="python"> 
+<parameters> 
+<param name="bitness" value="*" /> 
+<param name="python-kind" value="*" /> 
+<param name="python-script-code"><![CDATA[import os, platform 
+
+
+indent_string = " " 
+
+
+def print_log(message, indent_level=0): 
+print(indent_level * indent_string + message) 
+pass 
+
+
+print_log('Teamcity branch: ' + '%teamcity.build.branch%') 
+if '/' in '%teamcity.build.branch%' : 
+print('%teamcity.build.branch%'.split('/',2)) 
+branch_name = '%teamcity.build.branch%'.split('/',2)[-1] 
+print(branch_name) 
+branch_name = branch_name.replace('/','-') 
+print(branch_name) 
+else: 
+branch_name = '%teamcity.build.branch%' 
+
+
+output_dir = R"""%output_dir_to_change%""" 
+output_dir_win = R"""%output_dir_win_to_change%""" 
+build_number = '%build.number%' 
+
+
+branch_name_number = R"%s_%s" % (branch_name, build_number) 
+output_dir_branch = R"%s/%s" % (output_dir, branch_name_number) 
+output_dir_win_branch = R"%s\%s" % (output_dir_win, branch_name_number) 
+print_log('Output linux directory: ' + output_dir_branch) 
+print_log('Output windows directory: ' + output_dir_win_branch) 
+
+
+print_log('Setting teamcity parameters') 
+print ("##teamcity[setParameter name='output_dir' value='%s']" % (output_dir_branch,)) 
+print ("##teamcity[setParameter name='output_dir_win' value='%s']" % (output_dir_win_branch,)) 
+print ("##teamcity[setParameter name='branch_dir' value='%s']" % (branch_name_number,)) 
+<?xml version="1.0" encoding="UTF-8"?> 
+<meta-runner name="Change output_dir parameter"> 
+<description>Custom step to change output_dir parameter to mask "build_brunch"_"build_number"</description> 
+<settings> 
+<parameters> 
+<param name="output_dir_to_change" value="%output_dir%" /> 
+<param name="output_dir_win_to_change" value="%output_dir_win%" /> 
+</parameters> 
+<build-runners> 
+<runner name="Change output_dir parameter" type="python"> 
+<parameters> 
+<param name="bitness" value="*" /> 
+<param name="python-kind" value="*" /> 
+<param name="python-script-code"><![CDATA[import os, platform 
+
+
+indent_string = " " 
+
+
+def print_log(message, indent_level=0): 
+print(indent_level * indent_string + message) 
+pass 
+
+
+print_log('Teamcity branch: ' + '%teamcity.build.branch%') 
+if '/' in '%teamcity.build.branch%' : 
+print('%teamcity.build.branch%'.split('/',2)) 
+branch_name = '%teamcity.build.branch%'.split('/',2)[-1] 
+print(branch_name) 
+branch_name = branch_name.replace('/','-') 
+print(branch_name) 
+else: 
+branch_name = '%teamcity.build.branch%' 
+
+
+output_dir = R"""%output_dir_to_change%""" 
+output_dir_win = R"""%output_dir_win_to_change%""" 
+build_number = '%build.number%' 
+
+
+branch_name_number = R"%s_%s" % (branch_name, build_number) 
+output_dir_branch = R"%s/%s" % (output_dir, branch_name_number) 
+output_dir_win_branch = R"%s\%s" % (output_dir_win, branch_name_number) 
+print_log('Output linux directory: ' + output_dir_branch) 
+print_log('Output windows directory: ' + output_dir_win_branch) 
+
+
+print_log('Setting teamcity parameters') 
+print ("##teamcity[setParameter name='output_dir' value='%s']" % (output_dir_branch,)) 
+print ("##teamcity[setParameter name='output_dir_win' value='%s']" % (output_dir_win_branch,)) 
+print ("##teamcity[setParameter name='branch_dir' value='%s']" % (branch_name_number,)) 
+
+
+print_log('Your build platform is ' + platform.system()) 
+if (platform.system() == 'Linux' ): 
+dir_name = output_dir_branch 
+elif (platform.system() == 'Windows' ): 
+dir_name =output_dir_win_branch 
+else: 
+print ("Unknown os") 
+exit(-1) 
+print_log('Creating folder: ' + dir_name) 
+if not os.path.exists(dir_name): 
+os.makedirs(dir_name)]]></param> 
+<param name="python-script-mode" value="code" /> 
+<param name="python-ver" value="*" /> 
+<param name="teamcity.step.mode" value="default" /> 
+</parameters> 
+</runner> 
+</build-runners> 
+<requirements /> 
+</settings> 
+</meta-runner> 
+
+
+
+print_log('Your build platform is ' + platform.system()) 
+if (platform.system() == 'Linux' ): 
+dir_name = output_dir_branch 
+elif (platform.system() == 'Windows' ): 
+dir_name =output_dir_win_branch 
+else: 
+print ("Unknown os") 
+exit(-1) 
+print_log('Creating folder: ' + dir_name) 
+if not os.path.exists(dir_name): 
+os.makedirs(dir_name)]]></param> 
+<param name="python-script-mode" value="code" /> 
+<param name="python-ver" value="*" /> 
+<param name="teamcity.step.mode" value="default" /> 
+</parameters> 
+</runner> 
+</build-runners> 
+<requirements /> 
+</settings> 
+</meta-runner> 
+
