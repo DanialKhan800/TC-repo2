@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<meta-runner name="Generate &quot;Artifacts on share&quot; tab"> 
+<description>When this step enabled, build results page will have additional tab called "Artifacts on share" with the link to share path with build results.</description> 
+<settings> 
+<parameters> 
+<param name="WinBuildOutputDirOnShare" value="%output_dir_win%" /> 
+<param name="LinBuildOutputDirOnShare" value="%output_dir%" /> 
+<param name="BuildArtifactTargetDir" value="report" /> 
+<param name="PathToScripts" value="%tccdev_checkout_dir%/it_scripts" /> 
+<param name="LocalReportPath" value="report/artifacts_on_share.html" /> 
+</parameters> 
+<build-runners> 
+<runner name="generate artifacts on share tab" type="simpleRunner"> 
+<parameters> 
+<param name="command.executable" value="python" /> 
+<param name="command.parameters" value="%PathToScripts%/custom_build_summary/generate_artifact_share_tab.py --force --win-share-path %WinBuildOutputDirOnShare% --lin-share-path %LinBuildOutputDirOnShare% --output-file-path %LocalReportPath% --artifact-path %BuildArtifactTargetDir%" /> 
+<param name="teamcity.step.mode" value="default" /> 
+</parameters> 
+</runner> 
+</build-runners> 
+<requirements /> 
+</settings> 
+</meta-runner>
+
