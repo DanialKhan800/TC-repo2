@@ -38,3 +38,18 @@ echo Bios type set as $BIOS_TYPE
 --tests_list "${BASIC_PATH}/install/tests/tests_lists/${PLATFORM_NAME}/${TEST_TYPE}/tests_list_robot_$WORKFLOW.txt" \ 
 --skip %EXCLUDE_TAGS% 
 
+
+%target_hostname% 
+
+
+set -e 
+set -x 
+
+
+cd ~/.tcc_tools 
+./tcc_setup.py -u -f 
+%target_hostname% 
+%target_download_dir%/check_tcc_uninstall.sh -d 
+
+
+
