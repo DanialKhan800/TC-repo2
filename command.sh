@@ -3,7 +3,7 @@ set -e
 
 
 # Remove old host key and try to connect 
-ssh-keygen -R 20.51.200.239
+# ssh-keygen -R 20.51.200.239
 #sshpass -p %TargetPass%
 #ssh -o StrictHostKeyChecking=no 192.168.10.9 'uname -a' 
 
